@@ -1,0 +1,29 @@
+{
+	"name" : "mouf/security.ldap-service",
+	"description" : "This package contains a cache mechanism that relies on temporary files.",
+	"type" : "mouf-library",
+	"authors" : [{
+			"name" : "Xavier HUBERTY",
+			"email" : "x.huberty@thecodingmachine.com",
+			"homepage" : "http://mouf-php.com"
+		}
+	],
+	"keywords" : [
+		"mouf",
+		"security",
+		"ldap"
+	],
+	"homepage" : "https://github.com/thecodingmachine/security.ldap-service",
+	"license" : [
+		"MIT"
+	],
+    "require": {
+		"zendframework/Component_ZendLdap": "2.*"
+    },
+	 "autoload" : {
+		"psr-4" : {
+			"Mouf\\Security\\LdapService\\" : "src/"
+		}
+	},
+    "minimum-stability": "dev"
+}
