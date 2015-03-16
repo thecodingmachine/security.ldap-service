@@ -1,6 +1,6 @@
 {
 	"name" : "mouf/security.ldap-service",
-	"description" : "This package contains a cache mechanism that relies on temporary files.",
+	"description" : "This package contains a wrapper of Zendframework Ldap component who dialogue easily with Ldap.",
 	"type" : "mouf-library",
 	"authors" : [{
 			"name" : "Xavier HUBERTY",
@@ -18,12 +18,29 @@
 		"MIT"
 	],
     "require": {
-		"zendframework/Component_ZendLdap": "2.*"
+		"mouf/mouf": "~2.0",
+		"zendframework/zend-ldap": "~2.3"
     },
 	 "autoload" : {
 		"psr-4" : {
 			"Mouf\\Security\\LdapService\\" : "src/"
 		}
 	},
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+	"prefer-stable": true,
+    "extra": {
+      "mouf": {
+        "install": [
+          {
+            "type": "url",
+            "url": "ldapuserinstall",
+            "scope": "local",
+            "description": "Set all the properties needed to connect to your Ldap server"
+          }
+        ],
+        "require-admin": [
+          "src/LdapUserAdmin.php"
+        ]
+      }
+    }
 }
