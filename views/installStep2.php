@@ -33,9 +33,7 @@
 <div class="control-group">
 	<label for="baseDn" class="control-label">Base Dn:</label>
 	<div class="controls">
-		<select id="baseDn" name="baseDn">
-			
-		</select>
+        <input type="text" id="baseDn" name="baseDn" class="recomputeDbList" value="<?php echo plainstring_to_htmlprotected($this->password) ?>" />
 		<span class="help-block">The base Dn to connect to your ldap server. For example 'dc=thecodingmachine,dc=com'</span>
 	</div>
 </div>
