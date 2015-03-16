@@ -33,7 +33,7 @@
         "install": [
           {
             "type": "url",
-            "url": "ldapuserinstall",
+            "url": "ldapuserinstall/",
             "scope": "local",
             "description": "Set all the properties needed to connect to your Ldap server"
           }

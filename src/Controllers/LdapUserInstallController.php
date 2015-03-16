@@ -48,7 +48,7 @@ class LdapUserInstallController extends Controller  {
 			$this->moufManager = MoufManager::getMoufManagerHiddenInstance();
 		}
 				
-		$this->contentBlock->addFile(dirname(__FILE__)."/../../../../views/installStep1.php", $this);
+		$this->contentBlock->addFile(dirname(__FILE__)."/../../../views/installStep1.php", $this);
 		$this->template->toHtml();
 	}
 	
@@ -91,7 +91,7 @@ class LdapUserInstallController extends Controller  {
 		$this->user = "root";
 		$this->password = "";
 				
-		$this->contentBlock->addFile(dirname(__FILE__)."/../../../../views/installStep2.php", $this);
+		$this->contentBlock->addFile(dirname(__FILE__)."/../../../views/installStep2.php", $this);
 		$this->template->toHtml();
 	}
 	
