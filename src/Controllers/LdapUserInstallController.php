@@ -85,7 +85,7 @@ class LdapUserInstallController extends Controller  {
 		}
 		
 		$this->host = "";
-		$this->$baseDn = "";
+		$this->baseDn = "";
 		$this->user = "";
 		$this->password = "";
 				
