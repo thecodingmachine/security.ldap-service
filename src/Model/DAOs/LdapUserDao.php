@@ -24,15 +24,27 @@ class LdapUserDao implements UserDaoInterface
      * @var LdapPasswordService
      */
     private $ldapPasswordService;
+    
+    /**
+     * Information to login
+     * This add LDAP_BASEDN at the end
+     * For example ou=users for
+     * ou=users,dc=xxxxx
+     * 
+     * @var string
+     */
+    private $schema;
 
     /**
      * @param Ldap                $ldap
      * @param LdapPasswordService $ldapService
+     * @param string $schema Information to login  This add LDAP_BASEDN at the end For example ou=users for ou=users,dc=xxxxx
      */
-    public function __construct(Ldap $ldap, LdapPasswordService $ldapPasswordService)
+    public function __construct(Ldap $ldap, LdapPasswordService $ldapPasswordService, $schema)
     {
         $this->ldap = $ldap;
         $this->ldapPasswordService = $ldapPasswordService;
+        $this->schema = $schema;
     }
 
     /**
@@ -86,7 +98,14 @@ class LdapUserDao implements UserDaoInterface
      */
     public function getUserById($id)
     {
-        throw new \Exception('Not implemented yet');
+        $this->ldap->bind();
+        $result = $this->ldap->search("(&(objectClass=posixAccount)(cn=".AbstractFilter::escapeValue($id)."))", ($this->schema?$this->schema.',':'').LDAP_BASEDN);
+        $user = $result->getFirst();
+        if ($user) {
+            return new LdapUser($user);
+        } else {
+            return;
+        }
     }
 
     /**
@@ -100,7 +119,7 @@ class LdapUserDao implements UserDaoInterface
     public function getUserByLogin($login)
     {
         $this->ldap->bind();
-        $result = $this->ldap->search("(&(objectClass=posixAccount)(uid=".AbstractFilter::escapeValue($login)."))", 'ou=users,dc=thecodingmachine,dc=com');
+        $result = $this->ldap->search("(&(objectClass=posixAccount)(uid=".AbstractFilter::escapeValue($login)."))", ($this->schema?$this->schema.',':'').LDAP_BASEDN);
         $user = $result->getFirst();
         if ($user) {
             return new LdapUser($user);
