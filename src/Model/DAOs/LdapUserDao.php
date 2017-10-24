@@ -2,7 +2,6 @@
 namespace Mouf\Security\LdapService\Model\DAOs;
 
 use Mouf\Security\LdapService\Model\Entities\LdapUser;
-use Mouf\Security\LdapService\Services\LdapPasswordService;
 use Mouf\Security\UserService\UserDaoInterface;
 use Mouf\Security\UserService\UserInterface;
 use Zend\Ldap\Ldap;
@@ -19,11 +18,6 @@ class LdapUserDao implements UserDaoInterface
      *@var Ldap
      */
     private $ldap;
-
-    /**
-     * @var LdapPasswordService
-     */
-    private $ldapPasswordService;
     
     /**
      * Information to login
@@ -37,36 +31,35 @@ class LdapUserDao implements UserDaoInterface
 
     /**
      * @param Ldap                $ldap
-     * @param LdapPasswordService $ldapService
      * @param string $schema Information to login  This add LDAP_BASEDN at the end For example ou=users for ou=users,dc=xxxxx
      */
-    public function __construct(Ldap $ldap, LdapPasswordService $ldapPasswordService, $schema)
+    public function __construct(Ldap $ldap, $schema)
     {
         $this->ldap = $ldap;
-        $this->ldapPasswordService = $ldapPasswordService;
         $this->schema = $schema;
     }
 
     /**
      * Returns a ldap entry from its login and its password, or null if the login or credentials are false.
      *
-     * @param  string        $login
-     * @param  string        $password
+     * @param string $login
+     * @param string $password
      * @return LdapUser|null
+     * @throws \Zend\Ldap\Exception\LdapException
      */
     public function getUserByCredentials($login, $password)
     {
-        $user = $this->getUserByLogin($login);
-        if ($user) {
-            $sha1Password = $this->ldapPasswordService->convertToLdapSha1($password);
-            if ($user->getUnique('userpassword') == $sha1Password) {
-                return $user;
+        try {
+            $this->ldap->bind("uid=$login,".($this->schema?$this->schema.',':'').LDAP_BASEDN, $password);
+        } catch (\Zend\Ldap\Exception\LdapException $exception) {
+            if ($exception->getCode() == 49) {
+                return null;
             } else {
-                return;
+                throw $exception;
             }
-        } else {
-            return;
         }
+        $user = $this->getUserByLogin($login);
+        return $user;
     }
 
     /**
@@ -119,12 +112,12 @@ class LdapUserDao implements UserDaoInterface
     public function getUserByLogin($login)
     {
         $this->ldap->bind();
-        $result = $this->ldap->search("(&(objectClass=posixAccount)(uid=".AbstractFilter::escapeValue($login)."))", ($this->schema?$this->schema.',':'').LDAP_BASEDN);
-        $user = $result->getFirst();
+        $result = $this->ldap->search("(&(objectClass=posixAccount) (uid=".AbstractFilter::escapeValue($login)."))", ($this->schema?$this->schema.',':'').LDAP_BASEDN);
+	$user = $result->getFirst();
         if ($user) {
             return new LdapUser($user);
         } else {
-            return;
+            return null;
         }
     }
 }
