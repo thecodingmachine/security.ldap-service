@@ -50,7 +50,7 @@ class LdapUserDao implements UserDaoInterface
     public function getUserByCredentials($login, $password)
     {
         try {
-            $this->ldap->bind("uid=$login,".($this->schema?$this->schema.',':'').LDAP_BASEDN, $password);
+            $this->ldap->bind("(uid=".AbstractFilter::escapeValue($login)."),".($this->schema?$this->schema.',':'').LDAP_BASEDN, $password);
         } catch (\Zend\Ldap\Exception\LdapException $exception) {
             if ($exception->getCode() == 49) {
                 return null;
@@ -92,7 +92,7 @@ class LdapUserDao implements UserDaoInterface
     public function getUserById($id)
     {
         $this->ldap->bind();
-        $result = $this->ldap->search("(&(objectClass=posixAccount)(cn=".AbstractFilter::escapeValue($id)."))", ($this->schema?$this->schema.',':'').LDAP_BASEDN);
+        $result = $this->ldap->search("(cn=".AbstractFilter::escapeValue($id).")", ($this->schema?$this->schema.',':'').LDAP_BASEDN);
         $user = $result->getFirst();
         if ($user) {
             return new LdapUser($user);
@@ -112,7 +112,7 @@ class LdapUserDao implements UserDaoInterface
     public function getUserByLogin($login)
     {
         $this->ldap->bind();
-        $result = $this->ldap->search("(&(objectClass=posixAccount) (uid=".AbstractFilter::escapeValue($login)."))", ($this->schema?$this->schema.',':'').LDAP_BASEDN);
+        $result = $this->ldap->search("(uid=".AbstractFilter::escapeValue($login).")", ($this->schema?$this->schema.',':'').LDAP_BASEDN);
 	$user = $result->getFirst();
         if ($user) {
             return new LdapUser($user);
