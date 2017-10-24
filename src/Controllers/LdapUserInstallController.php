@@ -142,15 +142,11 @@ class LdapUserInstallController extends Controller
                 \'baseDn\'   => LDAP_BASEDN
             ));
         return $ldap;');
-        $ldapPasswordService = InstallUtils::getOrCreateInstance('ldapPasswordService', 'Mouf\\Security\\LdapService\\Services\\LdapPasswordService', $moufManager);
         $ldapUserDao = InstallUtils::getOrCreateInstance('ldapUserDao', 'Mouf\\Security\\LdapService\\Model\\DAOs\\LdapUserDao', $moufManager);
 
         // Let's bind instances together.
         if (!$ldapUserDao->getConstructorArgumentProperty('ldap')->isValueSet()) {
             $ldapUserDao->getConstructorArgumentProperty('ldap')->setValue($ldap);
-        }
-        if (!$ldapUserDao->getConstructorArgumentProperty('ldapPasswordService')->isValueSet()) {
-            $ldapUserDao->getConstructorArgumentProperty('ldapPasswordService')->setValue($ldapPasswordService);
         }
 
         $configPhpConstants = $configManager->getDefinedConstants();
