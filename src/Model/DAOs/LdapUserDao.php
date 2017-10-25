@@ -4,6 +4,7 @@ namespace Mouf\Security\LdapService\Model\DAOs;
 use Mouf\Security\LdapService\Model\Entities\LdapUser;
 use Mouf\Security\UserService\UserDaoInterface;
 use Mouf\Security\UserService\UserInterface;
+use Zend\Ldap\Exception\LdapException;
 use Zend\Ldap\Ldap;
 use Zend\Ldap\Filter\AbstractFilter;
 
@@ -45,13 +46,13 @@ class LdapUserDao implements UserDaoInterface
      * @param string $login
      * @param string $password
      * @return LdapUser|null
-     * @throws \Zend\Ldap\Exception\LdapException
+     * @throws LdapException
      */
     public function getUserByCredentials($login, $password)
     {
         try {
-            $this->ldap->bind("(uid=".AbstractFilter::escapeValue($login)."),".($this->schema?$this->schema.',':'').LDAP_BASEDN, $password);
-        } catch (\Zend\Ldap\Exception\LdapException $exception) {
+            $this->ldap->bind("uid=".AbstractFilter::escapeValue($login).",".($this->schema?$this->schema.',':'').LDAP_BASEDN, $password);
+        } catch (LdapException $exception) {
             if ($exception->getCode() == 49) {
                 return null;
             } else {
@@ -107,7 +108,7 @@ class LdapUserDao implements UserDaoInterface
      * @param  string                             $login
      * @return LdapUser|null
      * @throws \Exception
-     * @throws \Zend\Ldap\Exception\LdapException
+     * @throws LdapException
      */
     public function getUserByLogin($login)
     {
