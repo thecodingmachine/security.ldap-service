@@ -51,7 +51,11 @@ class LdapUserDao implements UserDaoInterface
     public function getUserByCredentials($login, $password)
     {
         try {
-            $this->ldap->bind("uid=".AbstractFilter::escapeValue($login).",".($this->schema?$this->schema.',':'').LDAP_BASEDN, $password);
+            $this->ldap->bind();
+            $user = $this->getUserByLogin($login);
+            if ($user !== null) {
+                $this->ldap->bind("uid=" . AbstractFilter::escapeValue($user->getLogin()) . "," . ($this->schema ? $this->schema . ',' : '') . LDAP_BASEDN, $password);
+            }
         } catch (LdapException $exception) {
             if ($exception->getCode() == 49) {
                 return null;
@@ -59,7 +63,6 @@ class LdapUserDao implements UserDaoInterface
                 throw $exception;
             }
         }
-        $user = $this->getUserByLogin($login);
         return $user;
     }
 
@@ -112,9 +115,8 @@ class LdapUserDao implements UserDaoInterface
      */
     public function getUserByLogin($login)
     {
-        $this->ldap->bind();
         $result = $this->ldap->search("(uid=".AbstractFilter::escapeValue($login).")", ($this->schema?$this->schema.',':'').LDAP_BASEDN);
-	$user = $result->getFirst();
+        $user = $result->getFirst();
         if ($user) {
             return new LdapUser($user);
         } else {
